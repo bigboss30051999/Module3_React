@@ -3,10 +3,11 @@ import './App.css';
 import Login from "./Login";
 import Listnumber from "./Listnumber";
 import ListProduct from "./ListProduct";
+import ListStudent from "./ListStudent";
 function App() {
   return (
     <>
-<ListProduct/>
+<ListStudent/>
     </>
   );
 }
