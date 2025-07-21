@@ -1,31 +1,102 @@
 import {useState} from "react";
 
-export default function ListProduct(){
+
+export default function ListProduct() {
     let [products, setProducts] = useState([
-        {name:"Iphone13", price:10000, quantity:10},
-        {name:"Iphone14", price:15000, quantity:15},
-        {name:"Iphone15", price:20000, quantity:20},
-    ]);
-    let [name,setName] = useState('');
-    let [price,setPrice] = useState(0);
-    let[quantity,setQuantity] = useState(0);
-    function addProduct(){
-        setProducts([...products, {name,price,quantity}])
-        setName('');
-        setPrice(0)
-        setQuantity(0)
+            {name: 'iphone 1', price: 100, quantity: 10, category: 'phone'},
+            {name: 'iphone 2', price: 200, quantity: 15, category: 'phone'},
+            {name: 'iphone 3', price: 205, quantity: 16, category: 'phone'},
+            {name: 'mac pro', price: 2050, quantity: 11, category: 'laptop'},
+            {name: 'mac mini', price: 2005, quantity: 12, category: 'laptop'},
+            {name: 'mac air', price: 2055, quantity: 13, category: 'laptop'},
+        ]
+    );
+    let [categoryList, setCategoryList] = useState(['phone', 'laptop']);
+    let [newCate, setNewCate] = useState('');
+    let [product, setProduct] = useState({name: '', price: 0, quantity: 0, category: ''});
+    let [nameSearch, setNameSearch] = useState('');
+    let [sortType, setSortType] = useState(null);
+
+    function addProduct() {
+        setProducts([...products, product])
     }
-    return(
+
+    function addCategory() {
+        setCategoryList([...categoryList, newCate])
+    }
+
+    function displayList(products) {
+        let list = products
+            .filter(x => x.name.includes(nameSearch) || (x.price + '').includes(nameSearch))
+        if (sortType === null) {
+            return list
+        }
+        if (sortType === 'ASC') {
+            return list
+                .sort((a, b) => a.price - b.price)
+        }
+        if (sortType === 'DESC') {
+            return list
+                .sort((a, b) => b.price - a.price)
+        }
+    }
+
+    return (
         <>
-            {products.map((product)=>(
-                <h3>
-                {product.name}:{product.price},Số lượng:{product.quantity}
-                </h3>
-            ))}
-            <input type="text" value={name} onChange={e => setName(e.target.value)}/>
-            <input type="text" value={price} onChange={e => setPrice(+e.target.value)}/>
-            <input type="text" value={quantity} onChange={e => setQuantity(+e.target.value)}/>
-            <button onClick={addProduct}>Thêm Sản Phẩm</button>
+            {
+                categoryList.map((y, index) => (
+                    <h2>
+                        {index + 1}. {y}
+                    </h2>
+                ))
+            }
+            <input type="text" value={newCate} onChange={(e) => setNewCate(e.target.value)}/>
+            <button onClick={addCategory}>Thêm category</button>
+            <hr/>
+            <input type="text" value={nameSearch} onChange={(e) => setNameSearch(e.target.value)}/>
+            <button onClick={() => {
+                setSortType('ASC')
+            }}>Tang
+            </button>
+            <button onClick={() => {
+                setSortType('DESC')
+            }}>Giam
+            </button>
+            <button onClick={() => {
+                setSortType(null)
+            }}>Reset
+            </button>
+            <hr/>
+            {
+                displayList(products).map((product, index) => (
+                    <h3>
+                        {index + 1}. {product.name}: {product.price}, {product.quantity}, {product.category}
+                    </h3>
+                ))
+            }
+
+            <input type="text"
+                   value={product.name}
+                   onChange={(e) =>
+                       setProduct({...product, name: e.target.value})}/>
+            <input type="text"
+                   value={product.price}
+                   onChange={(e) =>
+                       setProduct({...product, price: +e.target.value})}/>
+            <input type="text"
+                   value={product.quantity}
+                   onChange={(e) =>
+                       setProduct({...product, quantity: +e.target.value})}/>
+            <select value={product.category} onChange={(e) => {setProduct({...product, quantity: +e.target.value})}}>
+                {
+                    categoryList.map((y, index) => (
+                        <option value={y} key={index}>
+                            {y}
+                        </option>
+                    ))
+                }
+            </select>
+            <button onClick={addProduct}>Thêm</button>
         </>
     )
 }

@@ -1,43 +1,65 @@
-import {useState} from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 export default function ListStudent() {
-    let [students, setStudents] = useState([
-        {classSt: "12A2",name: "Huỳnh Vĩnh Xuyên", age: 18, score: 9},
-        {classSt: "12A2",name: "Phạm Quang Vinh", age: 18, score: 10},
-        {classSt: "12A2",name: "Lê Thị Kỳ Duyên", age: 18, score: 8},
-        {classSt: "12A2",name: "Lê Dạ Trúc Phương", age: 18, score: 9.5},
-        {classSt: "11A2",name: "Nguyễn Văn An", age: 17, score: 5},
-        {classSt: "11A2",name: "Phạm Minh Chi", age: 17, score: 7.5},
-        {classSt: "11A2",name: "Phạm Minh Triết", age: 17, score: 5.5},
-        {classSt: "10D2",name: "Trương Trung Hào", age: 16, score: 6.5},
-        {classSt: "10D2",name: "Lê Nguyễn Thành Danh", age: 16, score: 8.5},
-    ]);
-    let [name, setName] = useState('');
-    let [classSt, setClassSt] = useState('');
-    let [age, setAge] = useState(0);
-    let [score, setScore] = useState(0);
+    const [students, setStudents] = useState([]);
+    const [classes, setClasses] = useState([]);
+    const [classSelected, setClassSelected] = useState(null);
+    const navigate = useNavigate();
 
-    function addList() {
-        setStudents([...students, {classSt,name,age,score}]);
-        setName('');
-        setAge(0)
-        setClassSt('')
-        setScore(0)
+    useEffect(() => {
+        loadStudents();
+    }, []);
+
+    function loadStudents() {
+        axios.get("http://localhost:9999/students").then(response => {
+            const list = response.data;
+            const listClass = [...new Set(list.map(s => s.class))];
+            setClasses(listClass);
+            setStudents(list);
+        });
+    }
+
+    function filterStudent() {
+        if (classSelected === null) return students;
+        return students.filter(student => student.class === classSelected);
+    }
+
+    function deleteStudent(id) {
+        if (window.confirm("Bạn có chắc muốn xoá học sinh này không?")) {
+            axios.delete("http://localhost:9999/students/" + id).then(() => {
+                loadStudents();
+            });
+        }
     }
 
     return (
-        <>
-            {students.map((student)=>(
-                <h3>
-                    Lớp:{student.classSt},{student.name},Tuổi:{student.age},Điểm:{student.score}
-                </h3>
-            ))}
-            <input type="text" value={classSt} onChange={e => setClassSt(e.target.value)}/>
-            <input type="text" value={name} onChange={e => setName(e.target.value)}/>
-            <input type="text" value={age} onChange={e => setAge(+e.target.value)}/>
-            <input type="text" value={score} onChange={e => setScore(+e.target.value)}/>
-            <button onClick={addList}>Thêm Học Sinh</button>
-        </>
-    )
+        <div className="container-student" style={{ padding: 20 }}>
+            <h1>Danh sách học sinh</h1>
+
+            <button onClick={() => navigate("/add-student")}>Tạo mới</button>
+
+            <div style={{ marginTop: 10 }}>
+                {classes.map(cls => (
+                    <button key={cls} onClick={() => setClassSelected(cls)} style={{ margin: 5 }}>
+                        {cls}
+                    </button>
+                ))}
+                <button onClick={() => setClassSelected(null)} style={{ margin: 5 }}>
+                    Tất cả
+                </button>
+            </div>
+
+            <ul style={{ marginTop: 20 }}>
+                {filterStudent().map(student => (
+                    <li key={student.id}>
+                        {student.name} - {student.class} - GPA: {student.gpa}
+                        <button
+                            onClick={() => deleteStudent(student.id)}
+                        >Xoá</button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+    );
 }
-
-

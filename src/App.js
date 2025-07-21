@@ -1,15 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
-import Login from "./Login";
-import Listnumber from "./Listnumber";
-import ListProduct from "./ListProduct";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ListStudent from "./ListStudent";
+import AddStudent from "./AddStudent";
 function App() {
-  return (
-    <>
-<ListStudent/>
-    </>
-  );
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path="/" element={<Navigate to="/students" />} />
+                <Route path="/students" element={<ListStudent />} />
+                <Route path="/add-student" element={<AddStudent />} />
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default App;
